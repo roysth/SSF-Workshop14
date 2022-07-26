@@ -22,13 +22,26 @@ public class ContactsRedis implements ContactsRepo {
     @Override
     public void save(final Contact ctc) {
         //To access value operations (ID number)
-        redisTemplate.opsForValue().set(ctc.getId(), ctc);
+        redisTemplate.opsForHash().put(ctc.getId(), "name", ctc.getName());
+        redisTemplate.opsForHash().put(ctc.getId(), "email", ctc.getEmail());
+        redisTemplate.opsForHash().put(ctc.getId(), "phoneNumber", ctc.getPhoneNumber());
     }
 
     @Override
     public Contact findById(final String contactId) {
-        Contact result = (Contact) redisTemplate.opsForValue().get(contactId);
-        logger.info(">>> " + result.getEmail());
-        return result;
+        String name = (String) redisTemplate.opsForHash().get(contactId, "name");
+        String email = (String) redisTemplate.opsForHash().get(contactId, "email");
+        Integer phoneNumber = (Integer) redisTemplate.opsForHash().get(contactId, "phoneNumber");
+        logger.info(">>> name " + name);
+        logger.info(">>> email " + email);
+        logger.info(">>> phoneNumber " + phoneNumber);
+
+        Contact ct = new Contact();
+        ct.setId(contactId);
+        ct.setName(name);
+        ct.setEmail(email);
+        ct.setPhoneNumber(phoneNumber.intValue());
+
+        return ct;
     }
 }

@@ -37,6 +37,7 @@ public class AddressBookController {
     }
 
     //http://localhost:8080/contact/
+    //@ModelAttribute cus need to show the values online
     @PostMapping("/contact")
     public String submitContact(@ModelAttribute Contact contact, Model model) {
         logger.info("contact id > " + contact.getId());
