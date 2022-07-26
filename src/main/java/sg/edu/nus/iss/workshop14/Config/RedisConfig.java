@@ -47,6 +47,8 @@ public class RedisConfig {
         template.setConnectionFactory(jedisFac);
         template.setKeySerializer(new StringRedisSerializer());
 
+        //Java objects will be serialized
+        //allows java to read the from redis
         RedisSerializer<Object> serializer = new JdkSerializationRedisSerializer(getClass().getClassLoader());
         template.setValueSerializer(
             serializer

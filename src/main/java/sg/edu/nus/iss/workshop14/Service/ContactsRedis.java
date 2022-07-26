@@ -1,5 +1,6 @@
 package sg.edu.nus.iss.workshop14.Service;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +18,31 @@ public class ContactsRedis implements ContactsRepo {
     @Autowired
     RedisTemplate<String, Object> redisTemplate;
 
-
-    //to override ContactsRepo?
     @Override
     public void save(final Contact ctc) {
-        //ANNOTAE THIS! To access value operations
-        redisTemplate.opsForValue().set(ctc.getId(), ctc);
+        //keyname for this case is the ID NUMBER
+        redisTemplate.opsForList().rightPush(ctc.getId(), ctc.getName());
+        redisTemplate.opsForList().rightPush(ctc.getId(), ctc.getEmail());
+        redisTemplate.opsForList().rightPush(ctc.getId(), ctc.getPhoneNumber());
     }
 
     @Override
     public Contact findById(final String contactId) {
-        Contact result = (Contact) redisTemplate.opsForValue().get(contactId);
-        logger.info(">>> " + result.getEmail());
-        return result;
+        //Contact result = (Contact) redisTemplate.opsForValue().get(contactId);
+        String name = (String) redisTemplate.opsForList().index(contactId,0);
+        String email = (String) redisTemplate.opsForList().index(contactId,1);
+        Integer phoneNumber = (Integer) redisTemplate.opsForList().index(contactId,2);
+
+        logger.info(">>> name " + name);
+        logger.info(">>> email " + email);
+        logger.info(">>> phoneNumber " + phoneNumber);
+        
+        Contact ct = new Contact();
+        ct.setId(contactId);
+        ct.setName(name);
+        ct.setEmail(email);
+        ct.setPhoneNumber(phoneNumber.intValue());
+
+        return ct;
     }
 }
